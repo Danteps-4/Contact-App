@@ -113,36 +113,39 @@ def login():
 @app.route("/sign_up", methods=["GET", "POST"])
 def sign_up():
     if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
-        password2 = request.form["password2"]
-        email = request.form["email"]
+        try:
+            username = request.form["username"]
+            password = request.form["password"]
+            password2 = request.form["password2"]
+            email = request.form["email"]
 
-        user_username = User.query.filter_by(username=username).first()
-        user_email = User.query.filter_by(email=email).first()
+            user_username = User.query.filter_by(username=username).first()
+            user_email = User.query.filter_by(email=email).first()
 
-        if user_username:
-            flash("Username already exist")
-        else:
-            if user_email:
-                flash("Email already used")
+            if user_username:
+                flash("Username already exist")
             else:
-                if password != password2:
-                    flash("Passwords do not match")
+                if user_email:
+                    flash("Email already used")
                 else:
-                    hashed_password = generate_password_hash(password)
-                    user = User(username, hashed_password, email)
+                    if password != password2:
+                        flash("Passwords do not match")
+                    else:
+                        hashed_password = generate_password_hash(password)
+                        user = User(username, hashed_password, email)
 
-                    db.session.add(user)
-                    db.session.commit()
+                        db.session.add(user)
+                        db.session.commit()
 
-                    login_user(user)
+                        login_user(user)
 
-                    msg = Message("Email sent", sender="danteaugsburger4@gmail.com",
-                                  recipients=[email])
-                    msg.body = f"Hello {current_user.username},\n\nYou registered an account on Contacts App, before being able to use your account you need to verify that this is your email address by clicking here:\n\n[link] \n\nKind Regards, Dante Augsburger."
-                    mail.send(msg)
-                    return redirect(url_for("home"))
+                        msg = Message("Email sent", sender="danteaugsburger4@gmail.com",
+                                      recipients=[email])
+                        msg.body = f"Hello {current_user.username},\n\nYou registered an account on Contacts App, before being able to use your account you need to verify that this is your email address by clicking here:\n\n[link] \n\nKind Regards, Dante Augsburger."
+                        mail.send(msg)
+                        return redirect(url_for("home"))
+        except Exception as e:
+            return str(e)
 
     return render_template("auth/sign_up.html")
 
