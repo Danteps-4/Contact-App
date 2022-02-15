@@ -139,10 +139,6 @@ def sign_up():
 
                         login_user(user)
 
-                        msg = Message("Email sent", sender="danteaugsburger4@gmail.com",
-                                      recipients=[email])
-                        msg.body = f"Hello {current_user.username},\n\nYou registered an account on Contacts App, before being able to use your account you need to verify that this is your email address by clicking here:\n\n[link] \n\nKind Regards, Dante Augsburger."
-                        mail.send(msg)
                         return redirect(url_for("home"))
         except Exception as e:
             return str(e)
